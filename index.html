@@ -135,6 +135,15 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
 .linkbox input{flex:1;min-width:0;border:1.5px solid #9aa1a6;border-radius:8px;padding:10px;font-size:14px;color:var(--ink);background:#f7f6f3}
 .linkbox button{flex:none;min-height:44px;padding:0 14px;border-radius:8px;border:2px solid var(--ink);background:#fff;font-weight:700;cursor:pointer}
 .status{min-height:20px;margin:8px 0 0;font-size:14px;font-weight:600;color:#1f6b32}
+.qr-box{display:flex;flex-wrap:wrap;gap:14px;align-items:center;border:2px solid var(--ink);border-radius:10px;padding:12px}
+.qr{width:230px;height:230px;flex:none;background:#fff}
+.qr svg,.qr img{width:100%;height:100%;display:block}
+.qr-copy{flex:1 1 200px;min-width:0}
+.qr-copy strong{display:block;font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:18px;letter-spacing:.5px;text-transform:uppercase}
+.qr-copy p{margin:4px 0 10px;font-size:15px}
+.qr-copy a{color:var(--ink);font-weight:600;font-size:15px}
+.btn-sm{min-height:44px;font-size:15px;padding:8px 12px}
+.mini-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 
 /* Log */
 .search{width:100%;min-height:48px;border:2px solid var(--ink);border-radius:8px;padding:10px 12px;font-size:16px;background:#fff;margin:0 0 12px}
@@ -245,12 +254,25 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           <span id="sendTextLabel">Text stub</span>
         </a>
+        <div class="qr-box" id="smsQr" hidden>
+          <div class="qr" id="qrCode" role="img" aria-label="Code that opens a text message to the customer on your phone"></div>
+          <div class="qr-copy">
+            <strong>Text from your phone</strong>
+            <p>Point your phone's camera at this code. It opens a text to <b id="qrPhone"></b> with the stub link already written in. Tap Send.</p>
+            <button type="button" class="btn btn-ghost btn-sm" id="copyText">Copy text message</button>
+            <p style="margin:10px 0 0"><a id="smsDesktop" href="#">Or open the texting app on this computer</a></p>
+          </div>
+        </div>
         <a class="btn" id="sendEmail" href="#" aria-disabled="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
           <span id="sendEmailLabel">Email stub</span>
         </a>
+        <div class="mini-row" id="webMail" hidden>
+          <a class="btn btn-ghost btn-sm" id="gmailLink" href="#" target="_blank" rel="noopener">Email in Gmail</a>
+          <a class="btn btn-ghost btn-sm" id="outlookLink" href="#" target="_blank" rel="noopener">Email in Outlook</a>
+        </div>
       </div>
-      <p class="hint">Each button opens Messages or Mail with the stub link already written in. Tap Send there.</p>
+      <p class="hint" id="sendHint">Each button opens Messages or Mail with the stub link already written in. Tap Send there.</p>
       <div class="linkbox">
         <label class="sr" for="stubLink">Customer stub link</label>
         <input id="stubLink" readonly>
@@ -327,10 +349,15 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
   </div>
 </template>
 
+<script src="assets/qrcode.js"></script>
 <script>
 (function(){
   'use strict';
   var SHOP_PHONE = '323 285-6000';
+  var UA = navigator.userAgent || '';
+  var IS_IOS = /iPad|iPhone|iPod/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var IS_ANDROID = /Android/i.test(UA);
+  var IS_MOBILE = IS_IOS || IS_ANDROID || /Mobi/i.test(UA);
   var START_NUMBER = 151071;
   var $ = function(s){ return document.querySelector(s); };
 
@@ -472,29 +499,67 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
     if (href) { a.href = href; a.removeAttribute('aria-disabled'); }
     else { a.href = '#'; a.setAttribute('aria-disabled', 'true'); }
   }
+  function smsHref(num, text){
+    // iPhone/iPad use "&body=", Android and computers use "?body=".
+    return 'sms:' + num + (IS_IOS ? '&body=' : '?body=') + encodeURIComponent(text);
+  }
+  function drawQR(el, data){
+    el.innerHTML = '';
+    if (typeof qrcode !== 'function') return false;
+    try {
+      var qr = qrcode(0, 'L'); qr.addData(data); qr.make();
+      el.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 16, scalable: true });
+      return true;
+    } catch (e) { return false; }
+  }
   function openDone(t){
     current = t;
     var link = stubLink(t);
     $('#doneTitle').textContent = 'Tag #' + t.n + ' is ready';
     $('#doneSub').textContent = 'For ' + t.name + (t.dp ? ' · promised ' + fmtDate(t.dp) : '');
     var sms = smsNumber(t.phone);
-    setBtn($('#sendText'), sms ? 'sms:' + sms + '?&body=' + encodeURIComponent(textMessage(t, link)) : '',
+    var txt = textMessage(t, link);
+    setBtn($('#sendText'), sms ? smsHref(sms, txt) : '',
       sms ? 'Text stub to ' + t.phone : 'No phone number on this tag', $('#sendTextLabel'));
-    setBtn($('#sendEmail'), t.email ? 'mailto:' + t.email + '?subject=' + encodeURIComponent(emailSubject(t)) + '&body=' + encodeURIComponent(emailBody(t, link)) : '',
+    var subj = emailSubject(t), body = emailBody(t, link);
+    setBtn($('#sendEmail'), t.email ? 'mailto:' + t.email + '?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body) : '',
       t.email ? 'Email stub to ' + t.email : 'No email on this tag', $('#sendEmailLabel'));
+    // Computers can't text by themselves: show a code the staff phone scans to send the text.
+    var desktopText = !IS_MOBILE && !!sms && drawQR($('#qrCode'), 'SMSTO:' + sms + ':' + txt);
+    $('#smsQr').hidden = !desktopText;
+    $('#sendText').hidden = desktopText;
+    $('#qrPhone').textContent = t.phone;
+    $('#smsDesktop').href = sms ? smsHref(sms, txt) : '#';
+    $('#copyText').onclick = function(){ copy(txt, 'Text message copied.'); };
+    var webMail = !IS_MOBILE && !!t.email;
+    $('#webMail').hidden = !webMail;
+    if (webMail) {
+      $('#gmailLink').href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(t.email) + '&su=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+      $('#outlookLink').href = 'https://outlook.office.com/mail/deeplink/compose?to=' + encodeURIComponent(t.email) + '&subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+    }
+    $('#sendHint').textContent = IS_MOBILE
+      ? 'Each button opens Messages or Mail with the stub link already written in. Tap Send there.'
+      : 'Email opens your mail program, or use Gmail or Outlook in the browser. The text goes out from your phone with the code. Tap Send in each.';
     $('#stubLink').value = link;
     $('#openStub').href = link;
     $('#copyStatus').textContent = '';
     var wrap = $('#renderWrap'); wrap.innerHTML = ''; wrap.appendChild(buildTag(t));
     show('done');
   }
-  $('#copyLink').addEventListener('click', function(){
+  function copy(text, okMsg){
     var inp = $('#stubLink');
-    function ok(){ $('#copyStatus').textContent = 'Link copied.'; }
-    function manual(){ inp.focus(); inp.select(); $('#copyStatus').textContent = 'Link selected. Copy it from the box.'; }
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(inp.value).then(ok, manual);
+    function ok(){ $('#copyStatus').textContent = okMsg; }
+    function manual(){
+      var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+      var done = false; try { done = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      if (done) ok(); else { inp.focus(); inp.select(); $('#copyStatus').textContent = 'Copy it from the box above.'; }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, manual);
     else manual();
-  });
+  }
+  $('#copyLink').addEventListener('click', function(){ copy($('#stubLink').value, 'Link copied.'); });
   $('#printTag').addEventListener('click', function(){
     if (!current) return;
     var root = $('#printRoot'); root.innerHTML = ''; root.appendChild(buildTag(current));
@@ -532,12 +597,12 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
   var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
   var deferred = null;
   if (!standalone && !load('wpa.hideInstall', false)) {
-    var ua = navigator.userAgent || '';
-    var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (isIOS) $('#installCard').hidden = false;
+    if (IS_IOS) $('#installCard').hidden = false;
     window.addEventListener('beforeinstallprompt', function(e){
       e.preventDefault(); deferred = e;
-      $('#installText').textContent = 'Put it on your home screen so it opens like an app.';
+      $('#installText').textContent = IS_MOBILE
+        ? 'Put it on your home screen so it opens like an app.'
+        : 'Install it on this computer so it opens in its own window like an app.';
       $('#installBtn').hidden = false; $('#installCard').hidden = false;
     });
   }
