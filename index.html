@@ -290,7 +290,9 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
         </button>
         <a class="btn btn-ghost" id="openStub" href="#" target="_blank" rel="noopener">Their Stub</a>
       </div>
-      <p class="hint">Tag + Stub prints at actual size (3.5 × 7.75 in) to hang on the gear. Their Stub opens the page your customer gets, which has its own Print button.</p>
+      <button type="button" class="btn btn-ghost btn-sm" id="saveTagPdf" style="margin-top:10px">Save Tag as PDF</button>
+      <p class="hint" id="printHint">Tag + Stub prints at actual size (3.5 × 7.75 in) to hang on the gear. If the print window doesn't open, use Save Tag as PDF and print the PDF. Their Stub opens the page your customer gets, which has its own Print button.</p>
+      <p class="status" id="printStatus" role="status"></p>
     </div>
 
     <div class="render-wrap" id="renderWrap"></div>
@@ -350,6 +352,7 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
 </template>
 
 <script src="assets/qrcode.js"></script>
+<script src="assets/printpdf.js"></script>
 <script>
 (function(){
   'use strict';
@@ -487,7 +490,7 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
   });
 
   /* ---------- done view ---------- */
-  var current = null;
+  var current = null, currentPdf = null, pdfPromise = null;
   function fillTag(node, t){
     var map = { n: t.n, phone: t.phone, dr: fmtDate(t.dr), name: t.name, addr1: t.addr1, addr2: t.addr2, dp: fmtDate(t.dp), work: t.work, email: t.email };
     node.querySelectorAll('[data-f]').forEach(function(el){ el.textContent = map[el.getAttribute('data-f')] || ''; });
@@ -543,6 +546,18 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
     $('#stubLink').value = link;
     $('#openStub').href = link;
     $('#copyStatus').textContent = '';
+    $('#printStatus').textContent = '';
+    // Build the print-ready PDF now, so Print can open the share sheet right away.
+    currentPdf = null; pdfPromise = null;
+    if (window.WPAPrint) {
+      pdfPromise = WPAPrint.tagPdf({ n: t.n, phone: t.phone, dr: fmtDate(t.dr), name: t.name, addr1: t.addr1, addr2: t.addr2,
+        dp: fmtDate(t.dp), work: t.work, email: t.email });
+      pdfPromise.then(function(b){ if (current === t) currentPdf = b; }, function(){});
+    }
+    $('#saveTagPdf').hidden = IS_IOS || !window.WPAPrint;
+    $('#printHint').textContent = IS_IOS
+      ? 'Tag + Stub opens the share sheet with a print-ready PDF. Tap Print (or Save to Files). It prints at actual size, 3.5 × 7.75 in. Their Stub opens the page your customer gets.'
+      : 'Tag + Stub prints at actual size (3.5 × 7.75 in) to hang on the gear. If the print window doesn’t open, use Save Tag as PDF and print the PDF. Their Stub opens the page your customer gets, which has its own Print button.';
     var wrap = $('#renderWrap'); wrap.innerHTML = ''; wrap.appendChild(buildTag(t));
     show('done');
   }
@@ -560,10 +575,31 @@ h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;l
     else manual();
   }
   $('#copyLink').addEventListener('click', function(){ copy($('#stubLink').value, 'Link copied.'); });
+  function withPdf(fn){
+    var st = $('#printStatus');
+    if (currentPdf) return fn(currentPdf);
+    if (!pdfPromise) { st.textContent = 'This device could not make the PDF.'; return; }
+    st.textContent = 'Getting the PDF ready…';
+    pdfPromise.then(function(b){ st.textContent = ''; fn(b); }, function(){ st.textContent = 'This device could not make the PDF.'; });
+  }
+  function pdfName(){ return 'WPA-Repair-Tag-' + current.n + '.pdf'; }
   $('#printTag').addEventListener('click', function(){
     if (!current) return;
+    if (IS_IOS && window.WPAPrint) {
+      // iPhone/iPad can't print from home-screen apps, so hand a PDF to the share sheet (it has Print).
+      withPdf(function(b){
+        WPAPrint.share(b, pdfName(), 'Repair Tag #' + current.n).then(function(r){
+          if (r === 'downloaded') $('#printStatus').textContent = 'PDF saved. Open it and tap Share, then Print.';
+        });
+      });
+      return;
+    }
     var root = $('#printRoot'); root.innerHTML = ''; root.appendChild(buildTag(current));
     window.print();
+  });
+  $('#saveTagPdf').addEventListener('click', function(){
+    if (!current) return;
+    withPdf(function(b){ WPAPrint.download(b, pdfName()); $('#printStatus').textContent = 'PDF saved to your downloads.'; });
   });
   $('#newTag').addEventListener('click', function(){ show('new'); f.phone.focus(); });
 

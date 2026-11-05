@@ -1,5 +1,5 @@
 /* WPA Repair Tags: offline support. Pages load fresh when online and from cache when not. */
-const CACHE = 'wpa-tags-v2';
+const CACHE = 'wpa-tags-v3';
 const SHELL = [
   './',
   'index.html',
@@ -7,6 +7,7 @@ const SHELL = [
   'manifest.webmanifest',
   'assets/wpa-logo-yellow.png',
   'assets/qrcode.js',
+  'assets/printpdf.js',
   'assets/icon-192.png',
   'assets/icon-512.png',
   'assets/favicon.png',

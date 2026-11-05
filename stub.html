@@ -80,10 +80,12 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg);color:var(--i
     <div class="actions">
       <button type="button" class="btn" id="printBtn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Print Stub
+        <span id="printLabel">Print Stub</span>
       </button>
+      <button type="button" class="btn ghost" id="saveBtn" hidden>Save Stub as PDF</button>
       <a class="btn ghost" href="tel:+13232856000">Call World Pro Audio</a>
     </div>
+    <p class="small" id="printStatus" role="status"></p>
     <p class="small">By appointment only. Please call before dropping by.</p>
   </div>
 
@@ -92,9 +94,12 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg);color:var(--i
     <p>The link may be cut off. Call World Pro Audio at <a href="tel:+13232856000">323 285-6000</a> and we'll send it again.</p>
   </div>
 </main>
+<script src="assets/printpdf.js"></script>
 <script>
 (function(){
   'use strict';
+  var UA = navigator.userAgent || '';
+  var IS_IOS = /iPad|iPhone|iPod/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   function fromB64url(s){
     s = s.replace(/-/g, '+').replace(/_/g, '/');
     while (s.length % 4) s += '=';
@@ -116,7 +121,37 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg);color:var(--i
   if (!data.w) document.getElementById('workRow').hidden = true;
   document.title = 'Repair Tag #' + data.n + ' · World Pro Audio';
   document.getElementById('stub').hidden = false;
-  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+
+  // Build a print-ready PDF right away. iPhone/iPad print it from the share sheet,
+  // because Print doesn't work in apps' built-in browsers there.
+  var status = document.getElementById('printStatus');
+  var pdf = null, pdfPromise = null, name = 'WPA-Claim-Stub-' + data.n + '.pdf';
+  if (window.WPAPrint) {
+    pdfPromise = WPAPrint.stubPdf({ n: data.n, nm: data.nm, dr: map.dr, dp: map.dp, w: data.w });
+    pdfPromise.then(function(b){ pdf = b; }, function(){});
+    document.getElementById('saveBtn').hidden = IS_IOS;
+  }
+  if (IS_IOS && window.WPAPrint) document.getElementById('printLabel').textContent = 'Print or Save Stub';
+  function withPdf(fn){
+    if (pdf) return fn(pdf);
+    if (!pdfPromise) { status.textContent = 'This phone could not make the PDF. Take a screenshot of the stub instead.'; return; }
+    status.textContent = 'Getting the PDF ready…';
+    pdfPromise.then(function(b){ status.textContent = ''; fn(b); }, function(){ status.textContent = 'This phone could not make the PDF. Take a screenshot of the stub instead.'; });
+  }
+  document.getElementById('printBtn').addEventListener('click', function(){
+    if (IS_IOS && window.WPAPrint) {
+      withPdf(function(b){
+        WPAPrint.share(b, name, 'Repair Tag #' + data.n).then(function(r){
+          if (r === 'downloaded') status.textContent = 'PDF saved. Open it and tap Share, then Print.';
+        });
+      });
+      return;
+    }
+    window.print();
+  });
+  document.getElementById('saveBtn').addEventListener('click', function(){
+    withPdf(function(b){ WPAPrint.download(b, name); status.textContent = 'PDF saved to your downloads.'; });
+  });
 })();
 </script>
 </body>
