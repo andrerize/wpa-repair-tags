@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Your World Pro Audio Claim Stub</title>
+<meta name="theme-color" content="#1a242a">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Open+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap">
+<style>
+:root{--orange:#F68B3F;--ink:#1a242a;--label:#2b3338;--line:#4c5459;--pen:#1d3f8f;--bg:#ebe8e3;--muted:#4f585e}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%;font-size:16px;line-height:1.45}
+[hidden]{display:none !important}
+.wrap{max-width:420px;margin:0 auto;padding:20px 14px 40px}
+.card{background:var(--orange);clip-path:polygon(42px 0,calc(100% - 42px) 0,100% 42px,100% 100%,0 100%,0 42px);-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.grommet{align-self:center;width:30px;height:30px;border-radius:50%;background:#b88a3e;border:2px solid #7d5a20;display:flex;align-items:center;justify-content:center}
+.grommet span{width:13px;height:13px;border-radius:50%;background:#fff;border:1px solid #6b4d1c}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.plate{background:var(--ink);border-radius:4px;padding:6px 9px;display:flex}
+.plate img{height:26px;width:auto;display:block}
+.kicker{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:17px;letter-spacing:1.5px;text-transform:uppercase;text-align:right;line-height:1.1}
+.numrow{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.numrow h1{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:700;font-size:40px;line-height:38px;text-transform:uppercase;margin:0;letter-spacing:.5px}
+.numbox{display:flex;flex-direction:column;align-items:flex-end}
+.numbox small{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase}
+.num{font-family:'IBM Plex Mono','Courier New',monospace;font-weight:500;font-size:38px;line-height:40px;letter-spacing:1px}
+.panel{background:#fff;display:flex;flex-direction:column}
+.row{display:flex;border-bottom:1.5px solid var(--line)}
+.row:last-child{border-bottom:0}
+.cell{flex:1;padding:6px 10px 8px;min-width:0}
+.cell.half{flex:0 0 50%;border-right:1.5px solid var(--line)}
+.lbl{display:block;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--label);line-height:16px}
+.val{display:block;font-weight:600;font-size:17px;line-height:24px;color:var(--pen);word-break:break-word;min-height:24px}
+.val.work{white-space:pre-wrap}
+.note{font-weight:700;font-size:15px;line-height:1.35;margin:0}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;font-size:14px;font-weight:700}
+.foot a{color:var(--ink)}
+.actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:12px 16px;border-radius:8px;border:2px solid var(--ink);background:var(--ink);color:#fff;font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.small{font-size:14px;color:var(--muted);text-align:center;margin:14px 0 0}
+.error{background:#fff;border-radius:12px;padding:20px;text-align:center}
+.error h1{font-family:Oswald,'Arial Narrow',sans-serif;font-size:24px;margin:0 0 8px}
+@media print{
+  @page{size:letter;margin:0.5in}
+  body{background:#fff}
+  .wrap{max-width:4in;padding:0}
+  .actions,.small{display:none !important}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div id="stub" hidden>
+    <article class="card" aria-labelledby="stubTitle">
+      <div class="grommet" aria-hidden="true"><span></span></div>
+      <div class="top">
+        <div class="plate"><img src="assets/wpa-logo-yellow.png" alt="World Pro Audio"></div>
+        <div class="kicker">Customer<br>Claim Stub</div>
+      </div>
+      <div class="numrow">
+        <h1 id="stubTitle">Repair<br>Tag</h1>
+        <div class="numbox"><small>Tag No.</small><span class="num" data-f="n"></span></div>
+      </div>
+      <div class="panel">
+        <div class="row"><div class="cell"><span class="lbl">Name</span><span class="val" data-f="nm"></span></div></div>
+        <div class="row"><div class="cell half"><span class="lbl">Date Received</span><span class="val" data-f="dr"></span></div><div class="cell"><span class="lbl">Date Promised</span><span class="val" data-f="dp"></span></div></div>
+        <div class="row" id="workRow"><div class="cell"><span class="lbl">Work to Be Done</span><span class="val work" data-f="w"></span></div></div>
+      </div>
+      <p class="note">Show this stub, on your phone or printed, when you pick up your gear.</p>
+      <div class="foot"><a href="tel:+13232856000">323 285-6000</a><a href="https://www.worldproaudio.com">worldproaudio.com</a></div>
+    </article>
+    <div class="actions">
+      <button type="button" class="btn" id="printBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print Stub
+      </button>
+      <a class="btn ghost" href="tel:+13232856000">Call World Pro Audio</a>
+    </div>
+    <p class="small">By appointment only. Please call before dropping by.</p>
+  </div>
+
+  <div class="error" id="err" hidden>
+    <h1>We couldn't open this stub</h1>
+    <p>The link may be cut off. Call World Pro Audio at <a href="tel:+13232856000">323 285-6000</a> and we'll send it again.</p>
+  </div>
+</main>
+<script>
+(function(){
+  'use strict';
+  function fromB64url(s){
+    s = s.replace(/-/g, '+').replace(/_/g, '/');
+    while (s.length % 4) s += '=';
+    var bin = atob(s), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function fmtDate(iso){
+    if (!iso) return '';
+    var p = String(iso).split('-').map(Number);
+    if (p.length !== 3 || !p[0]) return String(iso);
+    return new Date(p[0], p[1] - 1, p[2]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  var data = null;
+  try { data = JSON.parse(fromB64url(location.hash.slice(1))); } catch (e) { data = null; }
+  if (!data || !data.n) { document.getElementById('err').hidden = false; return; }
+  var map = { n: data.n, nm: data.nm, dr: fmtDate(data.dr) || '—', dp: fmtDate(data.dp) || '—', w: data.w };
+  document.querySelectorAll('[data-f]').forEach(function(el){ el.textContent = map[el.getAttribute('data-f')] || ''; });
+  if (!data.w) document.getElementById('workRow').hidden = true;
+  document.title = 'Repair Tag #' + data.n + ' · World Pro Audio';
+  document.getElementById('stub').hidden = false;
+  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+})();
+</script>
+</body>
+</html>

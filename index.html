@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>WPA Repair Tags</title>
+<meta name="theme-color" content="#1a242a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="WPA Tags">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=Open+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&display=swap">
+<style>
+:root{--orange:#F68B3F;--ink:#1a242a;--label:#2b3338;--line:#4c5459;--pen:#1d3f8f;--bg:#ebe8e3;--muted:#4f585e}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%;font-size:16px;line-height:1.45}
+button,input,textarea{font:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+[hidden]{display:none !important}
+
+/* App bar */
+.topbar{background:var(--ink);color:#fff;padding:env(safe-area-inset-top) 0 0;position:sticky;top:0;z-index:5}
+.topbar-in{max-width:540px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px 4px}
+.topbar-in img{height:26px;width:auto;display:block}
+.app-title{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:17px;letter-spacing:1.5px;text-transform:uppercase;color:#fff;margin:0}
+.tabs{max-width:540px;margin:0 auto;display:flex;padding:0 8px}
+.tab{flex:1;appearance:none;background:transparent;border:0;color:#c9cfd3;font-family:Oswald,'Arial Narrow',sans-serif;font-weight:500;font-size:16px;letter-spacing:1px;text-transform:uppercase;padding:10px 8px;min-height:46px;border-bottom:4px solid transparent;cursor:pointer}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--orange)}
+.tab:focus-visible{outline:2px solid var(--orange);outline-offset:-4px}
+main{max-width:540px;margin:0 auto;padding:18px 12px calc(32px + env(safe-area-inset-bottom))}
+h2{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:26px;line-height:1.15;margin:0 0 4px;letter-spacing:.3px}
+.sub{margin:0 0 16px;color:var(--muted);font-size:16px}
+
+/* Buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;padding:12px 16px;border-radius:8px;border:2px solid var(--ink);background:var(--ink);color:#fff;font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;cursor:pointer;text-align:center}
+.btn svg{flex:none}
+.btn-orange{background:var(--orange);border-color:var(--orange);color:var(--ink)}
+.btn-ghost{background:#fff;color:var(--ink)}
+.btn[aria-disabled="true"]{background:#d9d6d0;border-color:#d9d6d0;color:#4f585e;pointer-events:none}
+.btn:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.btn-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stack{display:flex;flex-direction:column;gap:10px}
+
+/* Install card */
+.install{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:12px 14px;margin:0 0 16px;display:flex;gap:12px;align-items:flex-start}
+.install img{width:44px;height:44px;border-radius:10px;flex:none}
+.install p{margin:0;font-size:15px}
+.install strong{display:block;font-size:16px}
+.install .x{margin-left:auto;appearance:none;border:0;background:transparent;font-size:15px;font-weight:700;color:var(--ink);min-width:44px;min-height:44px;cursor:pointer;text-decoration:underline}
+.install .btn{margin-top:10px;min-height:44px;font-size:16px}
+
+/* ===== The tag ===== */
+.tag{background:var(--orange);color:var(--ink);clip-path:polygon(42px 0,calc(100% - 42px) 0,100% 42px,100% 100%,0 100%,0 42px);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.tag-head{padding:14px 18px 10px;display:flex;flex-direction:column;gap:6px}
+.grommet{align-self:center;width:30px;height:30px;margin:2px 0;border-radius:50%;background:#b88a3e;border:2px solid #7d5a20;display:flex;align-items:center;justify-content:center}
+.grommet span{width:13px;height:13px;border-radius:50%;background:#fff;border:1px solid #6b4d1c}
+.plate{align-self:flex-start;background:var(--ink);border-radius:4px;padding:6px 10px;display:flex}
+.plate img{height:36px;width:auto;display:block}
+.plate.sm{align-self:center;border-radius:3px;padding:4px 7px}
+.plate.sm img{height:20px}
+.title-row{display:flex;justify-content:space-between;align-items:flex-end;gap:8px;margin-top:4px}
+.title{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:700;font-size:48px;line-height:44px;letter-spacing:.5px;text-transform:uppercase}
+.num{font-family:'IBM Plex Mono','Courier New',monospace;font-weight:500;font-size:30px;line-height:34px;letter-spacing:1px;color:var(--ink)}
+.num-field{display:flex;flex-direction:column;align-items:flex-end}
+.num-field small{font-size:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.num-input{width:150px;border:0;border-bottom:2px dashed rgba(26,36,42,.55);background:transparent;text-align:right;padding:0;border-radius:0}
+.num-input:focus{outline:none;border-bottom:2px solid var(--ink);background:rgba(255,255,255,.35)}
+.panel{background:#fff;margin:0 12px 12px;display:flex;flex-direction:column}
+.row{display:flex;border-bottom:1.5px solid var(--line)}
+.row.last{border-bottom:0}
+.cell{flex:1;display:flex;flex-direction:column;padding:4px 8px;min-width:0}
+.cell.half{flex:0 0 52%;border-right:1.5px solid var(--line)}
+.lbl{font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--label);line-height:16px}
+.rule{height:5px;background:var(--ink);flex:none}
+.perf{display:flex;align-items:center;gap:6px;height:14px;padding:0 8px;flex:none}
+.perf .dash{flex:1;border-top:2px dashed var(--ink)}
+.stub{display:flex;flex-direction:column;gap:7px;padding:8px 12px 12px}
+.stub-top{display:flex;justify-content:space-between;align-items:center;min-height:28px}
+.stub-label{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:15px;letter-spacing:1.5px;text-transform:uppercase}
+.stub-panel{background:#fff;display:flex;min-height:40px}
+.stub-panel .cell.half{flex-basis:58%}
+.stub-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+.stub-note{font-size:12px;font-weight:600;line-height:16px}
+.stub-no{display:flex;flex-direction:column;align-items:flex-end}
+.stub-no small{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.stub-no .num{font-size:32px;line-height:34px}
+.stub-foot{display:flex;justify-content:space-between;font-size:12px;font-weight:700}
+
+/* Form version (fluid, touch-sized) */
+.tag-form .row{min-height:56px}
+.tag-form .cell{cursor:text}
+.tag-form .cell:focus-within{background:#fff4ea;box-shadow:inset 0 0 0 2px var(--orange)}
+.tag-form input:not(.num-input),.tag-form textarea{border:0;outline:0;background:transparent;font:600 16px/24px 'Open Sans',Arial,sans-serif;color:var(--pen);padding:2px 0 4px;width:100%;min-width:0;border-radius:0;-webkit-appearance:none;appearance:none}
+.tag-form input[type="date"]{min-height:30px;display:block}
+.tag-form input::placeholder{color:#7a8287;font-weight:400}
+.tag-form .work{display:flex;flex-direction:column}
+.tag-form .work-lbl{height:30px;display:flex;align-items:flex-end;padding:0 8px 4px;border-bottom:1px solid var(--line)}
+.tag-form textarea{display:block;resize:none;height:150px;line-height:30px;padding:0 8px;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 29px,var(--line) 29px,var(--line) 30px);background-attachment:local}
+.tag-form .work:focus-within{box-shadow:inset 0 0 0 2px var(--orange)}
+.tag-form .stub-panel .cell{cursor:default}
+.mirror{font:600 15px/22px 'Open Sans',Arial,sans-serif;color:var(--pen);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:22px}
+.form-msg{margin:12px 0 0;padding:10px 12px;border-radius:8px;background:#fff;border:2px solid #b3261e;color:#8c1d18;font-weight:600}
+.submit-area{margin-top:16px}
+.submit-hint{margin:8px 0 0;font-size:14px;color:var(--muted);text-align:center}
+
+/* Fixed print-size version: 3.5 x 7.75 in */
+.tag-fixed{width:336px;height:744px;display:flex;flex-direction:column;flex:none}
+.tag-fixed .main{height:552px;display:flex;flex-direction:column;flex:none}
+.tag-fixed .tag-head{height:210px;flex:none}
+.tag-fixed .panel{flex:1}
+.tag-fixed .row{height:38px;flex:none}
+.tag-fixed .cell{padding:2px 7px 0}
+.tag-fixed .lbl{line-height:14px}
+.tag-fixed .val{font:600 15px/18px 'Open Sans',Arial,sans-serif;color:var(--pen);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag-fixed .work{flex:1;display:flex;flex-direction:column}
+.tag-fixed .work-lbl{height:27px;flex:none;display:flex;align-items:flex-end;padding:0 7px 4px;border-bottom:1px solid var(--line)}
+.tag-fixed .work-text{height:108px;overflow:hidden;padding:0 7px;font:600 15px/27px 'Open Sans',Arial,sans-serif;color:var(--pen);white-space:pre-wrap;word-break:break-word;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 26px,var(--line) 26px,var(--line) 27px)}
+.tag-fixed .stub{flex:1}
+.tag-fixed .stub-panel{height:40px;flex:none}
+.tag-fixed .stub-bottom{flex:1}
+.render-wrap{display:flex;justify-content:center;margin:18px 0 6px}
+
+/* Done view */
+.card{background:#fff;border-radius:12px;padding:16px;margin:0 0 14px;border:1px solid #d6d2cb}
+.card h3{font-family:Oswald,'Arial Narrow',sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;text-transform:uppercase;margin:0 0 10px}
+.hint{margin:10px 0 0;font-size:14px;color:var(--muted)}
+.linkbox{display:flex;gap:8px;margin-top:12px}
+.linkbox input{flex:1;min-width:0;border:1.5px solid #9aa1a6;border-radius:8px;padding:10px;font-size:14px;color:var(--ink);background:#f7f6f3}
+.linkbox button{flex:none;min-height:44px;padding:0 14px;border-radius:8px;border:2px solid var(--ink);background:#fff;font-weight:700;cursor:pointer}
+.status{min-height:20px;margin:8px 0 0;font-size:14px;font-weight:600;color:#1f6b32}
+
+/* Log */
+.search{width:100%;min-height:48px;border:2px solid var(--ink);border-radius:8px;padding:10px 12px;font-size:16px;background:#fff;margin:0 0 12px}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.log button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:1px solid #d6d2cb;border-left:0;border-radius:10px;padding:12px 14px;cursor:pointer;min-height:64px}
+.log button:focus-visible{outline:3px solid var(--orange)}
+.log .chip{flex:none;background:var(--orange);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:16px;padding:6px 8px;border-radius:6px}
+.log .who{font-weight:700;font-size:16px;display:block}
+.log .when{font-size:14px;color:var(--muted);display:block}
+.empty{background:#fff;border-radius:12px;padding:20px;text-align:center;color:var(--muted)}
+.foot{margin-top:24px;text-align:center;font-size:13px;color:var(--muted)}
+
+#printRoot{display:none}
+@media print{
+  @page{size:letter;margin:0.5in}
+  body{background:#fff}
+  body > *:not(#printRoot){display:none !important}
+  #printRoot{display:flex;justify-content:center}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <img src="assets/wpa-logo-yellow.png" alt="World Pro Audio">
+    <h1 class="app-title">Repair Tags</h1>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" id="tab-new" aria-selected="true" aria-controls="view-new">New Tag</button>
+    <button class="tab" role="tab" id="tab-log" aria-selected="false" aria-controls="view-log">Tag Log</button>
+  </nav>
+</header>
+
+<main>
+  <!-- NEW TAG -->
+  <section id="view-new" role="tabpanel" aria-labelledby="tab-new">
+    <div class="install" id="installCard" hidden>
+      <img src="assets/icon-192.png" alt="">
+      <div>
+        <strong>Install the WPA Tags app</strong>
+        <p id="installText">On iPhone or iPad: tap the Share button, then <b>Add to Home Screen</b>.</p>
+        <button class="btn" id="installBtn" type="button" hidden>Install app</button>
+      </div>
+      <button class="x" id="installClose" type="button" aria-label="Hide install tip">Hide</button>
+    </div>
+
+    <form id="tagForm" class="tag tag-form" novalidate autocomplete="off">
+      <div class="tag-head">
+        <div class="grommet" aria-hidden="true"><span></span></div>
+        <div class="plate"><img src="assets/wpa-logo-yellow.png" alt="World Pro Audio"></div>
+        <div class="title-row">
+          <div class="title" aria-hidden="true">Repair<br>Tag</div>
+          <label class="num-field"><small>Tag No.</small><input id="f-num" class="num num-input" inputmode="numeric" pattern="[0-9]*" maxlength="9" aria-label="Tag number"></label>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="row">
+          <label class="cell half"><span class="lbl">Phone</span><input id="f-phone" type="tel" inputmode="tel" autocomplete="off" enterkeyhint="next"></label>
+          <label class="cell"><span class="lbl">Date Received</span><input id="f-dr" type="date"></label>
+        </div>
+        <div class="row"><label class="cell"><span class="lbl">Customer's Name</span><input id="f-name" autocomplete="off" autocapitalize="words" enterkeyhint="next"></label></div>
+        <div class="row"><label class="cell"><span class="lbl">Address</span><input id="f-addr1" autocapitalize="words" enterkeyhint="next"></label></div>
+        <div class="row">
+          <label class="cell half"><span class="sr">Address line 2</span><input id="f-addr2" placeholder="City, State ZIP" autocapitalize="words" enterkeyhint="next" aria-label="Address line 2"></label>
+          <label class="cell"><span class="lbl">Date Promised</span><input id="f-dp" type="date"></label>
+        </div>
+        <div class="rule"></div>
+        <label class="work"><span class="work-lbl lbl">Work to Be Done</span><textarea id="f-work" rows="5" autocapitalize="sentences" maxlength="400" aria-label="Work to be done"></textarea></label>
+        <div class="row last"><label class="cell"><span class="lbl">Email</span><input id="f-email" type="email" inputmode="email" autocapitalize="off" spellcheck="false" enterkeyhint="send"></label></div>
+      </div>
+      <div class="perf" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a242a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        <div class="dash"></div>
+      </div>
+      <div class="stub" aria-label="Customer stub preview">
+        <div class="stub-top"><div class="plate sm"><img src="assets/wpa-logo-yellow.png" alt="World Pro Audio"></div><div class="stub-label">Customer Stub</div></div>
+        <div class="stub-panel">
+          <div class="cell half"><span class="lbl">Name</span><span class="mirror" id="m-name"></span></div>
+          <div class="cell"><span class="lbl">Date Received</span><span class="mirror" id="m-dr"></span></div>
+        </div>
+        <div class="stub-bottom">
+          <div class="stub-note">Sent to the customer<br>as a digital stub.</div>
+          <div class="stub-no"><small>Repair Tag No.</small><span class="num" id="m-num"></span></div>
+        </div>
+      </div>
+      <button type="submit" class="sr" tabindex="-1">Create tag</button>
+    </form>
+
+    <div class="submit-area">
+      <button type="submit" form="tagForm" class="btn btn-orange" id="createBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        Create Tag &amp; Stub
+      </button>
+      <p class="form-msg" id="formMsg" role="alert" hidden></p>
+      <p class="submit-hint">Press Enter or tap Create. Next you'll text and email the stub to the customer.</p>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section id="view-done" hidden aria-live="polite">
+    <h2 id="doneTitle">Tag created</h2>
+    <p class="sub" id="doneSub"></p>
+
+    <div class="card">
+      <h3>Send the customer their stub</h3>
+      <div class="stack">
+        <a class="btn" id="sendText" href="#" aria-disabled="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span id="sendTextLabel">Text stub</span>
+        </a>
+        <a class="btn" id="sendEmail" href="#" aria-disabled="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+          <span id="sendEmailLabel">Email stub</span>
+        </a>
+      </div>
+      <p class="hint">Each button opens Messages or Mail with the stub link already written in. Tap Send there.</p>
+      <div class="linkbox">
+        <label class="sr" for="stubLink">Customer stub link</label>
+        <input id="stubLink" readonly>
+        <button type="button" id="copyLink">Copy link</button>
+      </div>
+      <p class="status" id="copyStatus" role="status"></p>
+    </div>
+
+    <div class="card">
+      <h3>Print</h3>
+      <div class="btn-row">
+        <button type="button" class="btn btn-ghost" id="printTag">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Tag + Stub
+        </button>
+        <a class="btn btn-ghost" id="openStub" href="#" target="_blank" rel="noopener">Their Stub</a>
+      </div>
+      <p class="hint">Tag + Stub prints at actual size (3.5 × 7.75 in) to hang on the gear. Their Stub opens the page your customer gets, which has its own Print button.</p>
+    </div>
+
+    <div class="render-wrap" id="renderWrap"></div>
+
+    <div class="stack" style="margin-top:14px">
+      <button type="button" class="btn btn-orange" id="newTag">New Tag</button>
+    </div>
+  </section>
+
+  <!-- LOG -->
+  <section id="view-log" role="tabpanel" aria-labelledby="tab-log" hidden>
+    <h2>Tag Log</h2>
+    <p class="sub">Tags made on this device, newest first.</p>
+    <label class="sr" for="logSearch">Search tags</label>
+    <input id="logSearch" class="search" type="search" placeholder="Search name, tag no. or phone">
+    <ul class="log" id="logList"></ul>
+    <div class="empty" id="logEmpty" hidden>No tags yet. Make one on the New Tag tab.</div>
+  </section>
+
+  <p class="foot">World Pro Audio · Repair Tags · Trial version: tags are saved on this device.</p>
+</main>
+
+<div id="printRoot"></div>
+
+<template id="tplTag">
+  <div class="tag tag-fixed">
+    <div class="main">
+      <div class="tag-head">
+        <div class="grommet" aria-hidden="true"><span></span></div>
+        <div class="plate"><img src="assets/wpa-logo-yellow.png" alt="World Pro Audio"></div>
+        <div class="title-row">
+          <div class="title">Repair<br>Tag</div>
+          <div class="num" data-f="n"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="row"><div class="cell half"><span class="lbl">Phone</span><span class="val" data-f="phone"></span></div><div class="cell"><span class="lbl">Date Received</span><span class="val" data-f="dr"></span></div></div>
+        <div class="row"><div class="cell"><span class="lbl">Customer's Name</span><span class="val" data-f="name"></span></div></div>
+        <div class="row"><div class="cell"><span class="lbl">Address</span><span class="val" data-f="addr1"></span></div></div>
+        <div class="row" style="border-bottom:0"><div class="cell half"><span class="lbl">&nbsp;</span><span class="val" data-f="addr2" style="font-size:13px"></span></div><div class="cell"><span class="lbl">Date Promised</span><span class="val" data-f="dp"></span></div></div>
+        <div class="rule"></div>
+        <div class="work"><span class="work-lbl lbl">Work to Be Done</span><div class="work-text" data-f="work"></div></div>
+        <div class="row last" style="border-top:1.5px solid var(--line)"><div class="cell"><span class="lbl">Email</span><span class="val" data-f="email"></span></div></div>
+      </div>
+    </div>
+    <div class="perf" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a242a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+      <div class="dash"></div>
+    </div>
+    <div class="stub">
+      <div class="stub-top"><div class="plate sm" style="align-self:center"><img src="assets/wpa-logo-yellow.png" alt="World Pro Audio"></div><div class="stub-label">Customer Stub</div></div>
+      <div class="stub-panel"><div class="cell half" style="padding:3px 7px"><span class="lbl">Name</span><span class="val" data-f="name"></span></div><div class="cell" style="padding:3px 7px"><span class="lbl">Date Received</span><span class="val" data-f="dr"></span></div></div>
+      <div class="stub-bottom"><div class="stub-note">Present this stub to<br>pick up your gear.</div><div class="stub-no"><small>Repair Tag No.</small><span class="num" data-f="n"></span></div></div>
+      <div class="stub-foot"><span>323 285-6000</span><span>worldproaudio.com</span></div>
+    </div>
+  </div>
+</template>
+
+<script>
+(function(){
+  'use strict';
+  var SHOP_PHONE = '323 285-6000';
+  var START_NUMBER = 151071;
+  var $ = function(s){ return document.querySelector(s); };
+
+  /* ---------- storage (this device) ---------- */
+  function load(key, fallback){ try { var v = localStorage.getItem(key); return v == null ? fallback : JSON.parse(v); } catch (e) { return fallback; } }
+  function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch (e) { return false; } }
+  function allTags(){ var t = load('wpa.tags', []); return Array.isArray(t) ? t : []; }
+  function nextNumber(){ var n = parseInt(load('wpa.next', START_NUMBER), 10); return isNaN(n) ? START_NUMBER : n; }
+
+  /* ---------- formatting ---------- */
+  function pad(n){ return String(n).padStart(2, '0'); }
+  function todayISO(){ var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function fmtDate(iso){
+    if (!iso) return '';
+    var p = iso.split('-').map(Number);
+    if (p.length !== 3 || !p[0]) return iso;
+    return new Date(p[0], p[1] - 1, p[2]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function digits(s){ return String(s || '').replace(/\D/g, ''); }
+  function fmtPhone(s){
+    var d = digits(s);
+    if (d.length === 11 && d[0] === '1') d = d.slice(1);
+    if (d.length === 10) return '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6);
+    return String(s || '').trim();
+  }
+  function smsNumber(s){
+    var d = digits(s);
+    if (d.length === 10) return '+1' + d;
+    if (d.length === 11 && d[0] === '1') return '+' + d;
+    return d;
+  }
+  function firstName(n){ return String(n || '').trim().split(/\s+/)[0] || 'there'; }
+  function b64url(str){
+    var bytes = new TextEncoder().encode(str), bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function stubLink(t){
+    var base = new URL('stub.html', location.href);
+    base.hash = ''; base.search = '';
+    var payload = { v: 1, n: t.n, nm: t.name, dr: t.dr, dp: t.dp, w: t.work };
+    return base.href.replace(/#$/, '') + '#' + b64url(JSON.stringify(payload));
+  }
+
+  /* ---------- messages ---------- */
+  function textMessage(t, link){
+    var s = 'World Pro Audio: Hi ' + firstName(t.name) + ', we have your gear. Repair Tag #' + t.n;
+    if (t.dr) s += ', received ' + fmtDate(t.dr);
+    if (t.dp) s += ', promised ' + fmtDate(t.dp);
+    s += '. Your digital claim stub: ' + link + ' Show it (or a printout) when you pick up. Questions? ' + SHOP_PHONE;
+    return s;
+  }
+  function emailSubject(t){ return 'Your World Pro Audio repair tag #' + t.n; }
+  function emailBody(t, link){
+    var L = [];
+    L.push('Hi ' + firstName(t.name) + ',', '');
+    L.push('Thanks for bringing your gear to World Pro Audio. Here is your digital claim stub:', link, '');
+    L.push('Repair Tag #: ' + t.n);
+    if (t.dr) L.push('Date received: ' + fmtDate(t.dr));
+    if (t.dp) L.push('Date promised: ' + fmtDate(t.dp));
+    if (t.work) L.push('', 'Work to be done:', t.work);
+    L.push('', 'Show this stub (on your phone or printed) when you pick up your gear.', '');
+    L.push('World Pro Audio', SHOP_PHONE + ' · worldproaudio.com', 'By appointment only. Please call before dropping by.');
+    return L.join('\n');
+  }
+
+  /* ---------- tabs ---------- */
+  var views = { new: $('#view-new'), done: $('#view-done'), log: $('#view-log') };
+  function show(name){
+    Object.keys(views).forEach(function(k){ views[k].hidden = (k !== name); });
+    var logOn = name === 'log';
+    $('#tab-new').setAttribute('aria-selected', String(!logOn));
+    $('#tab-log').setAttribute('aria-selected', String(logOn));
+    if (logOn) renderLog();
+    window.scrollTo(0, 0);
+  }
+  $('#tab-new').addEventListener('click', function(){ show('new'); });
+  $('#tab-log').addEventListener('click', function(){ show('log'); });
+
+  /* ---------- form ---------- */
+  var f = {
+    num: $('#f-num'), phone: $('#f-phone'), dr: $('#f-dr'), name: $('#f-name'), addr1: $('#f-addr1'),
+    addr2: $('#f-addr2'), dp: $('#f-dp'), work: $('#f-work'), email: $('#f-email')
+  };
+  function resetForm(){
+    $('#tagForm').reset();
+    f.num.value = String(nextNumber());
+    f.dr.value = todayISO();
+    $('#formMsg').hidden = true;
+    mirror();
+  }
+  function mirror(){
+    $('#m-num').textContent = digits(f.num.value) || '';
+    $('#m-name').textContent = f.name.value.trim();
+    $('#m-dr').textContent = fmtDate(f.dr.value);
+  }
+  ['input', 'change'].forEach(function(ev){
+    f.num.addEventListener(ev, mirror); f.name.addEventListener(ev, mirror); f.dr.addEventListener(ev, mirror);
+  });
+  $('#tagForm').addEventListener('input', function(){ $('#formMsg').hidden = true; });
+  f.phone.addEventListener('blur', function(){ if (digits(f.phone.value).length >= 10) f.phone.value = fmtPhone(f.phone.value); });
+
+  function fail(msg, field){
+    var m = $('#formMsg'); m.textContent = msg; m.hidden = false;
+    if (field) field.focus();
+  }
+
+  $('#tagForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var n = digits(f.num.value);
+    var t = {
+      n: n, name: f.name.value.trim(), phone: fmtPhone(f.phone.value), email: f.email.value.trim(),
+      addr1: f.addr1.value.trim(), addr2: f.addr2.value.trim(), dr: f.dr.value, dp: f.dp.value,
+      work: f.work.value.trim(), created: new Date().toISOString()
+    };
+    if (!n) return fail('Add a tag number.', f.num);
+    if (!t.name) return fail("Add the customer's name.", f.name);
+    if (!t.phone && !t.email) return fail('Add a phone number or an email so the customer can get their stub.', f.phone);
+    if (t.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t.email)) return fail('That email address looks incomplete.', f.email);
+    var tags = allTags();
+    if (tags.some(function(x){ return x.n === n; })) return fail('Tag #' + n + ' is already in the log. Change the tag number.', f.num);
+    tags.unshift(t);
+    if (!save('wpa.tags', tags)) return fail('This device would not save the tag (private browsing?). Turn off private mode and try again.');
+    save('wpa.next', Math.max(nextNumber(), parseInt(n, 10) + 1));
+    openDone(t);
+    resetForm();
+  });
+
+  /* ---------- done view ---------- */
+  var current = null;
+  function fillTag(node, t){
+    var map = { n: t.n, phone: t.phone, dr: fmtDate(t.dr), name: t.name, addr1: t.addr1, addr2: t.addr2, dp: fmtDate(t.dp), work: t.work, email: t.email };
+    node.querySelectorAll('[data-f]').forEach(function(el){ el.textContent = map[el.getAttribute('data-f')] || ''; });
+    return node;
+  }
+  function buildTag(t){ return fillTag(document.importNode($('#tplTag').content, true).firstElementChild, t); }
+  function setBtn(a, href, label, labelEl){
+    labelEl.textContent = label;
+    if (href) { a.href = href; a.removeAttribute('aria-disabled'); }
+    else { a.href = '#'; a.setAttribute('aria-disabled', 'true'); }
+  }
+  function openDone(t){
+    current = t;
+    var link = stubLink(t);
+    $('#doneTitle').textContent = 'Tag #' + t.n + ' is ready';
+    $('#doneSub').textContent = 'For ' + t.name + (t.dp ? ' · promised ' + fmtDate(t.dp) : '');
+    var sms = smsNumber(t.phone);
+    setBtn($('#sendText'), sms ? 'sms:' + sms + '?&body=' + encodeURIComponent(textMessage(t, link)) : '',
+      sms ? 'Text stub to ' + t.phone : 'No phone number on this tag', $('#sendTextLabel'));
+    setBtn($('#sendEmail'), t.email ? 'mailto:' + t.email + '?subject=' + encodeURIComponent(emailSubject(t)) + '&body=' + encodeURIComponent(emailBody(t, link)) : '',
+      t.email ? 'Email stub to ' + t.email : 'No email on this tag', $('#sendEmailLabel'));
+    $('#stubLink').value = link;
+    $('#openStub').href = link;
+    $('#copyStatus').textContent = '';
+    var wrap = $('#renderWrap'); wrap.innerHTML = ''; wrap.appendChild(buildTag(t));
+    show('done');
+  }
+  $('#copyLink').addEventListener('click', function(){
+    var inp = $('#stubLink');
+    function ok(){ $('#copyStatus').textContent = 'Link copied.'; }
+    function manual(){ inp.focus(); inp.select(); $('#copyStatus').textContent = 'Link selected. Copy it from the box.'; }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(inp.value).then(ok, manual);
+    else manual();
+  });
+  $('#printTag').addEventListener('click', function(){
+    if (!current) return;
+    var root = $('#printRoot'); root.innerHTML = ''; root.appendChild(buildTag(current));
+    window.print();
+  });
+  $('#newTag').addEventListener('click', function(){ show('new'); f.phone.focus(); });
+
+  /* ---------- log ---------- */
+  function renderLog(){
+    var q = $('#logSearch').value.trim().toLowerCase();
+    var qd = digits(q);
+    var list = $('#logList'); list.innerHTML = '';
+    var tags = allTags().filter(function(t){
+      if (!q) return true;
+      return (t.name || '').toLowerCase().indexOf(q) > -1 || (t.n || '').indexOf(q) > -1 || (qd && digits(t.phone).indexOf(qd) > -1);
+    });
+    $('#logEmpty').hidden = allTags().length > 0;
+    tags.forEach(function(t){
+      var li = document.createElement('li');
+      var b = document.createElement('button'); b.type = 'button';
+      var chip = document.createElement('span'); chip.className = 'chip'; chip.textContent = t.n;
+      var txt = document.createElement('span');
+      var who = document.createElement('span'); who.className = 'who'; who.textContent = t.name;
+      var when = document.createElement('span'); when.className = 'when';
+      when.textContent = 'Received ' + (fmtDate(t.dr) || '—') + (t.dp ? ' · Promised ' + fmtDate(t.dp) : '');
+      txt.appendChild(who); txt.appendChild(when);
+      b.appendChild(chip); b.appendChild(txt);
+      b.addEventListener('click', function(){ openDone(t); });
+      li.appendChild(b); list.appendChild(li);
+    });
+  }
+  $('#logSearch').addEventListener('input', renderLog);
+
+  /* ---------- install as an app ---------- */
+  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  var deferred = null;
+  if (!standalone && !load('wpa.hideInstall', false)) {
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (isIOS) $('#installCard').hidden = false;
+    window.addEventListener('beforeinstallprompt', function(e){
+      e.preventDefault(); deferred = e;
+      $('#installText').textContent = 'Put it on your home screen so it opens like an app.';
+      $('#installBtn').hidden = false; $('#installCard').hidden = false;
+    });
+  }
+  $('#installBtn').addEventListener('click', function(){
+    if (!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.finally(function(){ deferred = null; $('#installCard').hidden = true; });
+  });
+  $('#installClose').addEventListener('click', function(){ $('#installCard').hidden = true; save('wpa.hideInstall', true); });
+  window.addEventListener('appinstalled', function(){ $('#installCard').hidden = true; });
+
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  }
+
+  resetForm();
+})();
+</script>
+</body>
+</html>
